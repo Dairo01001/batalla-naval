@@ -21,7 +21,6 @@ public class Main extends JFrame {
     
     private void init() {
         setTitle("Batalla Naval");
-        setSize(800 , 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
@@ -83,6 +82,7 @@ public class Main extends JFrame {
     
     public static void main(String[] args) {
         Main wim = new Main();
+        wim.pack();
         wim.setVisible(true);
     }
 }

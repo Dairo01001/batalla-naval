@@ -1,7 +1,6 @@
 package board;
 
 import boat.Boat;
-import boat.Direction;
 import components.Const;
 import coordinate.Coordinate;
 import java.util.ArrayList;
@@ -29,6 +28,10 @@ public class Board {
 
         return boardAux;
     }
+    
+    public boolean isDone() {
+        return boats.size() == Const.QUANTITY_BOATS_TYPE * 4;
+    }
 
     public boolean addBoat(Boat boat) {
         if (boat == null) {
@@ -49,7 +52,7 @@ public class Board {
     public boolean isValid(Boat boat) {
         Coordinate head = boat.getHead();
         Coordinate tail = boat.getTail();
-
+        
         if ((head.getX() < 0 || head.getX() >= Const.BOART_SIZE) || (head.getY() < 0 || head.getY() >= Const.BOART_SIZE)) {
             return false;
         }

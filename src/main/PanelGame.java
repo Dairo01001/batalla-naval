@@ -6,11 +6,9 @@ import boat.Boat;
 import boat.Direction;
 import boat.Ironcland;
 import boat.Submarine;
-import boat.TypeBoat;
 import boat.Wrecker;
 import components.Button;
 import components.Const;
-import components.RadioButton;
 import components.TextField;
 import coordinate.Coordinate;
 import java.awt.BorderLayout;
@@ -19,7 +17,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -27,8 +24,11 @@ import utils.CheckInputs;
 
 public class PanelGame extends JPanel {
 
+    private TextField name;
     private CardLayout panels;
     private JPanel mainPanel;
+    private PanelConfig panelConfig;
+    private PanelStartGame panelStartGame;
     private BattleShip battleShip;
     private PanelBoard boardPlayer;
     private PanelBoard boardMachine;
@@ -52,7 +52,11 @@ public class PanelGame extends JPanel {
         panels = new CardLayout();
         mainPanel = new JPanel(panels);
 
-        mainPanel.add(new PanelConfig(), "Config");
+        panelConfig = new PanelConfig();
+        panelStartGame = new PanelStartGame();
+
+        mainPanel.add(panelConfig, "config");
+        mainPanel.add(panelStartGame, "startGame");
 
         add(mainPanel);
     }
@@ -61,10 +65,59 @@ public class PanelGame extends JPanel {
         return back;
     }
 
+    private class PanelStartGame extends JPanel {
+
+        private TextField puntoX;
+        private TextField puntoY;
+        private Button atack;
+
+        public PanelStartGame() {
+            init();
+            initComponents();
+        }
+
+        private void init() {
+            boardPlayer = new PanelBoard();
+            boardMachine = new PanelBoard();
+
+            puntoX = new TextField(4);
+            puntoY = new TextField(4);
+            atack = new Button("ATACAR");
+        }
+
+        private void initComponents() {
+
+            JPanel panelPlayer = new JPanel(new BorderLayout());
+            JPanel panelControlers = new JPanel();
+            panelControlers.add(puntoX);
+            panelControlers.add(puntoY);
+            panelControlers.add(atack);
+
+            panelPlayer.add(boardPlayer, BorderLayout.CENTER);
+            panelPlayer.add(panelControlers, BorderLayout.SOUTH);
+
+            add(panelPlayer);
+            add(boardMachine);
+        }
+    }
+
+    private class ActionStartGame implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            if (name.getText().equals("")) {
+                JOptionPane.showMessageDialog(mainPanel, "Escribe tu nombre!");
+            } else if (!battleShip.getBoardPlayer().isDone()) {
+                JOptionPane.showMessageDialog(mainPanel, "Tienes que ubicar todos tus barcos!");
+            }
+            panels.show(mainPanel, "startGame");
+
+        }
+    }
+
     private class PanelConfig extends JPanel {
 
         private Button addBoat;
-        private TextField name;
         private JComboBox dir;
         private PanelBoard boardConfig;
         private TextField coorX;
@@ -88,6 +141,8 @@ public class PanelGame extends JPanel {
             coorX = new TextField(5);
             coorY = new TextField(5);
 
+            start.addActionListener(new ActionStartGame());
+
             boardConfig = new PanelBoard();
 
             JPanel controllers = new JPanel();
@@ -100,10 +155,10 @@ public class PanelGame extends JPanel {
             JPanel panelName = initPanelBorder("NOMBRE JUGADOR");
             panelName.add(name);
 
-            JPanel panelCoorX = initPanelBorder("COORDENADA X");
+            JPanel panelCoorX = initPanelBorder("COORDENADA Y");
             panelCoorX.add(coorX);
 
-            JPanel panelCoorY = initPanelBorder("COORDENADA Y");
+            JPanel panelCoorY = initPanelBorder("COORDENADA X");
             panelCoorY.add(coorY);
 
             JPanel panelDirection = initPanelBorder("ORIENTACION");
@@ -148,9 +203,9 @@ public class PanelGame extends JPanel {
 
                     if (checkRange(x) && checkRange(y)) {
                         Boat newBoat = null;
-                        Direction newBoatDir = dir.getSelectedItem().toString().equals("Vertical") ? Direction.VERTICAL: Direction.HORIZONTAL;
+                        Direction newBoatDir = dir.getSelectedItem().toString().equals("Vertical") ? Direction.VERTICAL : Direction.HORIZONTAL;
                         Coordinate newBoatCoor = new Coordinate(x, y);
-                        
+
                         switch (Const.TYPES_BOATS[index]) {
                             case AIRCRAFT_CARRIER:
                                 newBoat = new AircraftCarrier(newBoatDir, newBoatCoor);
@@ -167,7 +222,7 @@ public class PanelGame extends JPanel {
                             default:
                                 break;
                         }
-                        
+
                         if (battleShip.getBoardPlayer().addBoat(newBoat)) {
                             boardConfig.setModelBoard(battleShip.getBoardPlayer());
                             countBoats[index]++;
