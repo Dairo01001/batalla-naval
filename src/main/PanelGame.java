@@ -9,6 +9,7 @@ import boat.Submarine;
 import boat.Wrecker;
 import components.Button;
 import components.Const;
+import components.Label;
 import components.TextField;
 import coordinate.Coordinate;
 import java.awt.BorderLayout;
@@ -24,7 +25,6 @@ import utils.CheckInputs;
 
 public class PanelGame extends JPanel {
 
-    private TextField name;
     private CardLayout panels;
     private JPanel mainPanel;
     private PanelConfig panelConfig;
@@ -105,9 +105,7 @@ public class PanelGame extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            if (name.getText().equals("")) {
-                JOptionPane.showMessageDialog(mainPanel, "Escribe tu nombre!");
-            } else if (!battleShip.getBoardPlayer().isDone()) {
+            if (!battleShip.getBoardPlayer().isDone()) {
                 JOptionPane.showMessageDialog(mainPanel, "Tienes que ubicar todos tus barcos!");
             }
             panels.show(mainPanel, "startGame");
@@ -124,6 +122,7 @@ public class PanelGame extends JPanel {
         private TextField coorY;
         private JComboBox boats;
         int[] countBoats = {0, 0, 0, 0};
+        private Label labelBoats[];
 
         public PanelConfig() {
             init();
@@ -137,9 +136,9 @@ public class PanelGame extends JPanel {
         private void initComponents() {
             addBoat = new Button("AGREGAR");
             addBoat.addActionListener(new ActionAddBoat());
-            name = new TextField(15);
             coorX = new TextField(5);
             coorY = new TextField(5);
+            labelBoats = new Label[4];
 
             start.addActionListener(new ActionStartGame());
 
@@ -152,8 +151,13 @@ public class PanelGame extends JPanel {
             JPanel inputs = new JPanel();
             inputs.setLayout(new BoxLayout(inputs, BoxLayout.Y_AXIS));
 
-            JPanel panelName = initPanelBorder("NOMBRE JUGADOR");
-            panelName.add(name);
+            JPanel countBoatsPanel = initPanelBorder("Barcos");
+            countBoatsPanel.setLayout(new BoxLayout(countBoatsPanel, BoxLayout.Y_AXIS));
+
+            for (int i = 0; i < countBoats.length; i++) {
+                labelBoats[i] = new Label(Const.NAMES_BOATS[i] + " " + (Const.QUANTITY_BOATS_TYPE - countBoats[i]));
+                countBoatsPanel.add(labelBoats[i]);
+            }
 
             JPanel panelCoorX = initPanelBorder("COORDENADA Y");
             panelCoorX.add(coorX);
@@ -172,10 +176,10 @@ public class PanelGame extends JPanel {
             boats.setFont(Const.FONT);
             panelBoats.add(boats);
 
-            inputs.add(panelName);
+            inputs.add(countBoatsPanel);
             inputs.add(panelBoats);
-            inputs.add(panelCoorX);
             inputs.add(panelCoorY);
+            inputs.add(panelCoorX);
             inputs.add(panelDirection);
 
             add(inputs, BorderLayout.WEST);
@@ -226,6 +230,11 @@ public class PanelGame extends JPanel {
                         if (battleShip.getBoardPlayer().addBoat(newBoat)) {
                             boardConfig.setModelBoard(battleShip.getBoardPlayer());
                             countBoats[index]++;
+                            
+                            for (int i = 0; i < countBoats.length; i++) {
+                                labelBoats[i].setText(Const.NAMES_BOATS[i] + " " + (Const.QUANTITY_BOATS_TYPE - countBoats[i]));
+                            }
+                            
                         } else {
                             JOptionPane.showMessageDialog(mainPanel, "Fallo al insertar el Barco no debe salirse del tablero ni chocar con algun otro.", "POSICION INVALIDA", JOptionPane.WARNING_MESSAGE);
                         }
