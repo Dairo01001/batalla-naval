@@ -4,12 +4,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/board/Board.java</file>
+            <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/main/PanelScore.java</file>
             <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/main/Main.java</file>
-            <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/player/Player.java</file>
-            <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/player/Machine.java</file>
-            <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/coordinate/Coordinate.java</file>
-            <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/main/PanelBoard.java</file>
+            <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/components/Const.java</file>
+            <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/utils/CheckInputs.java</file>
+            <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/utils/Save.java</file>
+            <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/utils/Open.java</file>
             <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/main/PanelGame.java</file>
+            <file>file:/home/dairo/NetBeansProjects/BatallaNaval/src/utils/BorderPanel.java</file>
         </group>
     </open-files>
 </project-private>

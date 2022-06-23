@@ -29,12 +29,14 @@ public class PanelGame extends JPanel {
 
     private final int TURN_PLAYER = 0;
     private final int TURN_MACHINE = 1;
+    
+    private int countErrorPlayer;
 
     private CardLayout panels;
     private JPanel mainPanel;
     private PanelConfig panelConfig;
     private PanelStartGame panelStartGame;
-    private BattleShip battleShip;
+    private final BattleShip battleShip;
     private PanelBoard boardPlayer;
     private PanelBoard boardMachine;
     private Button start;
@@ -48,6 +50,7 @@ public class PanelGame extends JPanel {
 
     private void init() {
         setFont(Const.FONT);
+        countErrorPlayer = 0;
     }
 
     private void initComponents() {
@@ -141,6 +144,7 @@ public class PanelGame extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
+                countErrorPlayer++;
                 if (CheckInputs.isNumber(puntoX.getText()) && CheckInputs.isNumber(puntoY.getText())) {
                     int x = Integer.parseInt(puntoX.getText());
                     int y = Integer.parseInt(puntoY.getText());
@@ -155,9 +159,9 @@ public class PanelGame extends JPanel {
                         puntoY.setText("");
                         log.append("Player: ");
                         log.append(shot.toString() + "\n");
+                        countErrorPlayer--;
                     } else {
                         JOptionPane.showMessageDialog(mainPanel, String.format("Ingresa un numero mayor a %d y  menor que %d.", 0, Const.BOART_SIZE), "FUERA DE RANGO", JOptionPane.WARNING_MESSAGE);
-
                     }
                 } else {
                     JOptionPane.showMessageDialog(mainPanel, "Ingresa numeros perro Chandoso!");
@@ -281,11 +285,13 @@ public class PanelGame extends JPanel {
                 if (countBoats[index] < Const.QUANTITY_BOATS_TYPE) {
                     checkAndCreate(index);
                 } else {
+                    countErrorPlayer++;
                     JOptionPane.showMessageDialog(mainPanel, "Elije otro tipo de Barco!", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
 
             private void checkAndCreate(int index) {
+                countErrorPlayer++;
                 if (CheckInputs.isNumber(coorX.getText()) && CheckInputs.isNumber(coorY.getText())) {
                     int x = Integer.parseInt(coorX.getText());
                     int y = Integer.parseInt(coorY.getText());
@@ -322,6 +328,8 @@ public class PanelGame extends JPanel {
 
                             coorX.setText("");
                             coorY.setText("");
+                            
+                            countErrorPlayer--;
 
                         } else {
                             JOptionPane.showMessageDialog(mainPanel, "Fallo al insertar el Barco no debe salirse del tablero ni chocar con algun otro.", "POSICION INVALIDA", JOptionPane.WARNING_MESSAGE);

@@ -91,6 +91,10 @@ public class Board {
     }
 
     public boolean evaluateShot(Coordinate shot) {
+        if(board[shot.getX()][shot.getY()].equals(TypeBox.BOAT_TOUCHED)) {
+            return true;
+        }
+        
         board[shot.getX()][shot.getY()] = TypeBox.WATER;
 
         for (Boat boat : boats) {
