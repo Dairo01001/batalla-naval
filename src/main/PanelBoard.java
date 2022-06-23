@@ -1,7 +1,6 @@
 package main;
 
 import board.Board;
-import board.TypeBox;
 import coordinate.Coordinate;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -37,17 +36,17 @@ public class PanelBoard extends JPanel {
         for (int i = 0; i < Board.SIZE; i++) {
             for (int j = 0; j < Board.SIZE; j++) {
                 switch (board.getTypeCoordinate(i, j)) {
-                    case UNKNOWN:
-                        cells[i][j].setBackground(Color.GRAY);
+                    case BOAT_TOUCHED:
+                        cells[i][j].setBackground(Color.RED);
                         break;
                     case BOAT:
                         cells[i][j].setBackground(Color.GREEN);
                         break;
-                    case WATER:
-                        cells[i][j].setBackground(Color.BLUE);
+                    case UNKNOWN:
+                        cells[i][j].setBackground(Color.GRAY);
                         break;
                     default:
-                        cells[i][j].setBackground(Color.RED);
+                        cells[i][j].setBackground(Color.BLUE);
                         break;
                 }
 

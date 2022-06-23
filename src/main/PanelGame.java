@@ -21,9 +21,14 @@ import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import utils.CheckInputs;
 
 public class PanelGame extends JPanel {
+
+    private final int TURN_PLAYER = 0;
+    private final int TURN_MACHINE = 1;
 
     private CardLayout panels;
     private JPanel mainPanel;
@@ -69,7 +74,9 @@ public class PanelGame extends JPanel {
 
         private TextField puntoX;
         private TextField puntoY;
+        private JTextArea log;
         private Button atack;
+        private int turn = TURN_PLAYER;
 
         public PanelStartGame() {
             init();
@@ -78,7 +85,7 @@ public class PanelGame extends JPanel {
 
         private void init() {
             boardPlayer = new PanelBoard();
-
+            log = new JTextArea();
             boardMachine = new PanelBoard();
 
             puntoX = new TextField(4);
@@ -87,18 +94,22 @@ public class PanelGame extends JPanel {
         }
 
         private void initComponents() {
-
+            log.append("Data \n");
+            log.setEditable(false);
             JPanel panelPlayer = new JPanel(new BorderLayout());
             JPanel panelControlers = new JPanel();
+            
+            JScrollPane scroll = new JScrollPane(log);
+            panelPlayer.add(scroll, BorderLayout.NORTH);
 
-            JPanel titlePuntoX = initPanelBorder("X");
+            JPanel titlePuntoX = initPanelBorder("Y");
             titlePuntoX.add(puntoX);
 
-            JPanel titlePuntoY = initPanelBorder("Y");
+            JPanel titlePuntoY = initPanelBorder("X");
             titlePuntoY.add(puntoY);
 
-            panelControlers.add(titlePuntoX);
             panelControlers.add(titlePuntoY);
+            panelControlers.add(titlePuntoX);
             panelControlers.add(atack);
 
             atack.addActionListener(new ActionAtack());
@@ -116,28 +127,57 @@ public class PanelGame extends JPanel {
             add(panelBoardMachine);
         }
 
+        private void turnOfMachine() {
+            Coordinate shot = battleShip.getMachine().attack();
+            if (!battleShip.getBoardPlayer().evaluateShot(shot)) {
+                turn = TURN_PLAYER;
+            }
+            log.append("Machine: ");
+            log.append(shot.toString() + "\n");
+            boardPlayer.setModelBoard(battleShip.getBoardPlayer());
+        }
+
         private class ActionAtack implements ActionListener {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-
                 if (CheckInputs.isNumber(puntoX.getText()) && CheckInputs.isNumber(puntoY.getText())) {
                     int x = Integer.parseInt(puntoX.getText());
                     int y = Integer.parseInt(puntoY.getText());
 
                     if (checkRange(x) && checkRange(y)) {
-                        if(battleShip.getBoardMachine().evaluateShot(new Coordinate(x, y))) {
-                            JOptionPane.showMessageDialog(mainPanel, "Me diste Perro!");    
+                        Coordinate shot = new Coordinate(x, y);
+                        if (battleShip.getBoardMachine().evaluateShot(shot)) {
+                            JOptionPane.showMessageDialog(mainPanel, "Me diste Perro!");
                         }
                         boardMachine.setModelForMachine(battleShip.getBoardMachine());
                         puntoX.setText("");
                         puntoY.setText("");
+                        log.append("Player: ");
+                        log.append(shot.toString() + "\n");
                     } else {
                         JOptionPane.showMessageDialog(mainPanel, String.format("Ingresa un numero mayor a %d y  menor que %d.", 0, Const.BOART_SIZE), "FUERA DE RANGO", JOptionPane.WARNING_MESSAGE);
 
                     }
                 } else {
                     JOptionPane.showMessageDialog(mainPanel, "Ingresa numeros perro Chandoso!");
+                }
+
+                if (battleShip.getBoardMachine().isDead()) {
+                    JOptionPane.showMessageDialog(mainPanel, "Has Ganado!");
+                    
+                    panels.show(mainPanel, "config");
+                }
+
+                turn = TURN_MACHINE;
+
+                while (turn == TURN_MACHINE) {
+                    turnOfMachine();
+                }
+
+                if (battleShip.getBoardPlayer().isDead()) {
+                    JOptionPane.showMessageDialog(mainPanel, "Has Perdido!");
+                    panels.show(mainPanel, "config");
                 }
             }
         }
@@ -315,5 +355,9 @@ public class PanelGame extends JPanel {
                 BorderFactory.createTitledBorder(null, title, 0, 0, Const.FONT), BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         return borderPanel;
+    }
+    
+    private void clearBoard() {
+        battleShip.getBoardMachine();
     }
 }

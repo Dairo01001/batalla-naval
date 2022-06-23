@@ -29,6 +29,26 @@ public class Board {
         return boardAux;
     }
     
+    public void clearBoard() {
+        boats.clear();
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                board[i][j] = TypeBox.UNKNOWN;
+            }
+        }
+    }
+    
+    public boolean isDead() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if(board[i][j].equals(TypeBox.BOAT)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
     public boolean isDone() {
         return boats.size() == Const.QUANTITY_BOATS_TYPE * 4;
     }

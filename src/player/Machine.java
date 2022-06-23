@@ -5,25 +5,26 @@ import boat.Boat;
 import boat.Direction;
 import boat.Ironcland;
 import boat.Submarine;
-import boat.TypeBoat;
 import boat.Wrecker;
 import components.Const;
 import coordinate.Coordinate;
 import java.util.Random;
 
 public class Machine extends Player {
+    
+    private final Random random;
 
     public Machine() {
         super("Crocodrile", 0);
+        random = new Random();
     }
 
     public Coordinate attack() {
-        return new Coordinate(0, 0);
+        return new Coordinate(random.nextInt(Const.BOART_SIZE), random.nextInt(Const.BOART_SIZE));
     }
 
     public void buildingBoard(board.Board board) {
         Boat boat;
-        Random random = new Random();
         int countBoats[] = new int[]{0, 0, 0, 0};
         int index = 0;
 
