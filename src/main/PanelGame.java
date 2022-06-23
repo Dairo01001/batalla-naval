@@ -78,6 +78,7 @@ public class PanelGame extends JPanel {
 
         private void init() {
             boardPlayer = new PanelBoard();
+
             boardMachine = new PanelBoard();
 
             puntoX = new TextField(4);
@@ -89,15 +90,56 @@ public class PanelGame extends JPanel {
 
             JPanel panelPlayer = new JPanel(new BorderLayout());
             JPanel panelControlers = new JPanel();
-            panelControlers.add(puntoX);
-            panelControlers.add(puntoY);
+
+            JPanel titlePuntoX = initPanelBorder("X");
+            titlePuntoX.add(puntoX);
+
+            JPanel titlePuntoY = initPanelBorder("Y");
+            titlePuntoY.add(puntoY);
+
+            panelControlers.add(titlePuntoX);
+            panelControlers.add(titlePuntoY);
             panelControlers.add(atack);
 
-            panelPlayer.add(boardPlayer, BorderLayout.CENTER);
+            atack.addActionListener(new ActionAtack());
+
+            JPanel panelBoardPlayer = initPanelBorder("Tablero Jugador");
+            panelBoardPlayer.add(boardPlayer);
+
+            panelPlayer.add(panelBoardPlayer, BorderLayout.CENTER);
             panelPlayer.add(panelControlers, BorderLayout.SOUTH);
 
+            JPanel panelBoardMachine = initPanelBorder("Maquina!");
+            panelBoardMachine.add(boardMachine);
+
             add(panelPlayer);
-            add(boardMachine);
+            add(panelBoardMachine);
+        }
+
+        private class ActionAtack implements ActionListener {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+
+                if (CheckInputs.isNumber(puntoX.getText()) && CheckInputs.isNumber(puntoY.getText())) {
+                    int x = Integer.parseInt(puntoX.getText());
+                    int y = Integer.parseInt(puntoY.getText());
+
+                    if (checkRange(x) && checkRange(y)) {
+                        if(battleShip.getBoardMachine().evaluateShot(new Coordinate(x, y))) {
+                            JOptionPane.showMessageDialog(mainPanel, "Me diste Perro!");    
+                        }
+                        boardMachine.setModelForMachine(battleShip.getBoardMachine());
+                        puntoX.setText("");
+                        puntoY.setText("");
+                    } else {
+                        JOptionPane.showMessageDialog(mainPanel, String.format("Ingresa un numero mayor a %d y  menor que %d.", 0, Const.BOART_SIZE), "FUERA DE RANGO", JOptionPane.WARNING_MESSAGE);
+
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(mainPanel, "Ingresa numeros perro Chandoso!");
+                }
+            }
         }
     }
 
@@ -107,9 +149,12 @@ public class PanelGame extends JPanel {
         public void actionPerformed(ActionEvent ae) {
             if (!battleShip.getBoardPlayer().isDone()) {
                 JOptionPane.showMessageDialog(mainPanel, "Tienes que ubicar todos tus barcos!");
+            } else {
+                panels.show(mainPanel, "startGame");
+                boardPlayer.setModelBoard(battleShip.getBoardPlayer());
+                battleShip.getMachine().buildingBoard(battleShip.getBoardMachine());
+                boardMachine.setModelForMachine(battleShip.getBoardMachine());
             }
-            panels.show(mainPanel, "startGame");
-
         }
     }
 
@@ -193,7 +238,7 @@ public class PanelGame extends JPanel {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 int index = boats.getSelectedIndex();
-                if (countBoats[index] < 2) {
+                if (countBoats[index] < Const.QUANTITY_BOATS_TYPE) {
                     checkAndCreate(index);
                 } else {
                     JOptionPane.showMessageDialog(mainPanel, "Elije otro tipo de Barco!", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
@@ -230,11 +275,14 @@ public class PanelGame extends JPanel {
                         if (battleShip.getBoardPlayer().addBoat(newBoat)) {
                             boardConfig.setModelBoard(battleShip.getBoardPlayer());
                             countBoats[index]++;
-                            
+
                             for (int i = 0; i < countBoats.length; i++) {
                                 labelBoats[i].setText(Const.NAMES_BOATS[i] + " " + (Const.QUANTITY_BOATS_TYPE - countBoats[i]));
                             }
-                            
+
+                            coorX.setText("");
+                            coorY.setText("");
+
                         } else {
                             JOptionPane.showMessageDialog(mainPanel, "Fallo al insertar el Barco no debe salirse del tablero ni chocar con algun otro.", "POSICION INVALIDA", JOptionPane.WARNING_MESSAGE);
                         }
@@ -246,10 +294,6 @@ public class PanelGame extends JPanel {
                     JOptionPane.showMessageDialog(mainPanel, "Ingresa valores validos para las coordenadas!", "ERROR INPUT", JOptionPane.WARNING_MESSAGE);
                 }
             }
-
-            private boolean checkRange(int num) {
-                return num >= 0 && num < Const.BOART_SIZE;
-            }
         }
 
         private JPanel initPanelBorder(String title) {
@@ -259,5 +303,17 @@ public class PanelGame extends JPanel {
             ));
             return borderPanel;
         }
+    }
+
+    private boolean checkRange(int num) {
+        return num >= 0 && num < Const.BOART_SIZE;
+    }
+
+    private JPanel initPanelBorder(String title) {
+        JPanel borderPanel = new JPanel();
+        borderPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(null, title, 0, 0, Const.FONT), BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        return borderPanel;
     }
 }

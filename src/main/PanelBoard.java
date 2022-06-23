@@ -1,7 +1,7 @@
 package main;
 
 import board.Board;
-import components.Label;
+import board.TypeBox;
 import coordinate.Coordinate;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,7 +20,7 @@ public class PanelBoard extends JPanel {
 
     private void init() {
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
+
         cells = new Cell[Board.SIZE][Board.SIZE];
 
         for (int i = 0; i < cells.length; i++) {
@@ -51,6 +51,24 @@ public class PanelBoard extends JPanel {
                         break;
                 }
 
+            }
+        }
+    }
+
+    public void setModelForMachine(Board board) {
+        for (int i = 0; i < Board.SIZE; i++) {
+            for (int j = 0; j < Board.SIZE; j++) {
+                switch (board.getTypeCoordinate(i, j)) {
+                    case WATER:
+                        cells[i][j].setBackground(Color.BLUE);
+                        break;
+                    case BOAT_TOUCHED:
+                        cells[i][j].setBackground(Color.RED);
+                        break;
+                    default:
+                        cells[i][j].setBackground(Color.GRAY);
+
+                }
             }
         }
     }
