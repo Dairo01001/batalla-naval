@@ -31,6 +31,14 @@ public class PanelBoard extends JPanel {
 
         setLayout(new GridLayout(Board.SIZE + 1, Board.SIZE + 1, 4, 4));
     }
+    
+    public void clearBoard() {
+        for (int i = 0; i < Board.SIZE; i++) {
+            for (int j = 0; j < Board.SIZE; j++) {
+                cells[i][j].setBackground(Color.BLUE);
+            }
+        }
+    }
 
     public void setModelBoard(Board board) {
         for (int i = 0; i < Board.SIZE; i++) {

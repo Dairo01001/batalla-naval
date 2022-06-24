@@ -153,6 +153,7 @@ public class PanelGame extends JPanel {
                         Coordinate shot = new Coordinate(x, y);
                         if (battleShip.getBoardMachine().evaluateShot(shot)) {
                             JOptionPane.showMessageDialog(mainPanel, "Me diste Perro!");
+                            battleShip.getPlayer().setScore(battleShip.getPlayer().getScore() + 1);
                         }
                         boardMachine.setModelForMachine(battleShip.getBoardMachine());
                         puntoX.setText("");
@@ -169,7 +170,7 @@ public class PanelGame extends JPanel {
 
                 if (battleShip.getBoardMachine().isDead()) {
                     JOptionPane.showMessageDialog(mainPanel, "Has Ganado!");
-                    
+                    clearPanelConfig();
                     panels.show(mainPanel, "config");
                 }
 
@@ -181,10 +182,15 @@ public class PanelGame extends JPanel {
 
                 if (battleShip.getBoardPlayer().isDead()) {
                     JOptionPane.showMessageDialog(mainPanel, "Has Perdido!");
+                    clearPanelConfig();
                     panels.show(mainPanel, "config");
                 }
             }
         }
+    }
+    
+    private void clearPanelConfig() {
+        panelConfig.ClearConfig();
     }
 
     private class ActionStartGame implements ActionListener {
@@ -220,6 +226,11 @@ public class PanelGame extends JPanel {
 
         private void init() {
             setLayout(new BorderLayout());
+        }
+        
+        public void ClearConfig() {
+            countBoats = new int[] {0, 0, 0, 0};
+            boardConfig.clearBoard();
         }
 
         private void initComponents() {
@@ -343,14 +354,6 @@ public class PanelGame extends JPanel {
                 }
             }
         }
-
-        private JPanel initPanelBorder(String title) {
-            JPanel borderPanel = new JPanel();
-            borderPanel.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder(null, title, 0, 0, Const.FONT), BorderFactory.createEmptyBorder(10, 10, 10, 10)
-            ));
-            return borderPanel;
-        }
     }
 
     private boolean checkRange(int num) {
@@ -366,6 +369,7 @@ public class PanelGame extends JPanel {
     }
     
     private void clearBoard() {
-        battleShip.getBoardMachine();
+        battleShip.getBoardMachine().clearBoard();
+        battleShip.getBoardPlayer().clearBoard();
     }
 }
