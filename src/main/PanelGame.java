@@ -29,8 +29,10 @@ public class PanelGame extends JPanel {
 
     private final int TURN_PLAYER = 0;
     private final int TURN_MACHINE = 1;
-    
+
+    private Label countErrorLabel;
     private int countErrorPlayer;
+    private Button clearBoard;
 
     private CardLayout panels;
     private JPanel mainPanel;
@@ -56,6 +58,8 @@ public class PanelGame extends JPanel {
     private void initComponents() {
         start = new Button("COMENZAR");
         back = new Button("ATRAS");
+        clearBoard = new Button("LIMPIAR");
+        countErrorLabel = new Label("Error: " + countErrorPlayer);
 
         panels = new CardLayout();
         mainPanel = new JPanel(panels);
@@ -79,6 +83,9 @@ public class PanelGame extends JPanel {
         private TextField puntoY;
         private JTextArea log;
         private Button atack;
+        private Label namePlayer;
+        private Label countAtacksLabel;
+        private int countAtacks = 0;
         private int turn = TURN_PLAYER;
 
         public PanelStartGame() {
@@ -90,10 +97,20 @@ public class PanelGame extends JPanel {
             boardPlayer = new PanelBoard();
             log = new JTextArea();
             boardMachine = new PanelBoard();
+            countAtacksLabel = new Label("Numero de ataques: " + countAtacks);
+            namePlayer = new Label(battleShip.getPlayer().getNombre());
 
             puntoX = new TextField(4);
             puntoY = new TextField(4);
             atack = new Button("ATACAR");
+        }
+        
+        public void setNamePlayer(String name) {
+            namePlayer.setText("Nombre: " + name);
+        }
+        
+        private void update() {
+            countAtacksLabel.setText("Numero de ataques: " + countAtacks);
         }
 
         private void initComponents() {
@@ -101,7 +118,7 @@ public class PanelGame extends JPanel {
             log.setEditable(false);
             JPanel panelPlayer = new JPanel(new BorderLayout());
             JPanel panelControlers = new JPanel();
-            
+
             JScrollPane scroll = new JScrollPane(log);
             panelPlayer.add(scroll, BorderLayout.NORTH);
 
@@ -122,6 +139,12 @@ public class PanelGame extends JPanel {
 
             panelPlayer.add(panelBoardPlayer, BorderLayout.CENTER);
             panelPlayer.add(panelControlers, BorderLayout.SOUTH);
+            JPanel panelNort = new JPanel();
+            
+            
+            panelNort.add(namePlayer);
+            panelNort.add(countAtacksLabel);
+            panelPlayer.add(panelNort, BorderLayout.NORTH);
 
             JPanel panelBoardMachine = initPanelBorder("Maquina!");
             panelBoardMachine.add(boardMachine);
@@ -151,6 +174,8 @@ public class PanelGame extends JPanel {
 
                     if (checkRange(x) && checkRange(y)) {
                         Coordinate shot = new Coordinate(x, y);
+                        countAtacks++;
+                        update();
                         if (battleShip.getBoardMachine().evaluateShot(shot)) {
                             JOptionPane.showMessageDialog(mainPanel, "Me diste Perro!");
                             battleShip.getPlayer().setScore(battleShip.getPlayer().getScore() + 1);
@@ -188,7 +213,7 @@ public class PanelGame extends JPanel {
             }
         }
     }
-    
+
     private void clearPanelConfig() {
         panelConfig.ClearConfig();
     }
@@ -200,12 +225,17 @@ public class PanelGame extends JPanel {
             if (!battleShip.getBoardPlayer().isDone()) {
                 JOptionPane.showMessageDialog(mainPanel, "Tienes que ubicar todos tus barcos!");
             } else {
+                panelStartGame.setNamePlayer(battleShip.getPlayer().getNombre());
                 panels.show(mainPanel, "startGame");
                 boardPlayer.setModelBoard(battleShip.getBoardPlayer());
                 battleShip.getMachine().buildingBoard(battleShip.getBoardMachine());
                 boardMachine.setModelForMachine(battleShip.getBoardMachine());
             }
         }
+    }
+    
+    public player.Player getPlayer() {
+        return battleShip.getPlayer();
     }
 
     private class PanelConfig extends JPanel {
@@ -227,10 +257,20 @@ public class PanelGame extends JPanel {
         private void init() {
             setLayout(new BorderLayout());
         }
-        
+
         public void ClearConfig() {
-            countBoats = new int[] {0, 0, 0, 0};
+            countBoats = new int[]{0, 0, 0, 0};
             boardConfig.clearBoard();
+        }
+        
+
+        public boolean isCompleted() {
+            for (int numberBoats : countBoats) {
+                if (numberBoats != Const.QUANTITY_BOATS_TYPE) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private void initComponents() {
@@ -255,7 +295,7 @@ public class PanelGame extends JPanel {
             countBoatsPanel.setLayout(new BoxLayout(countBoatsPanel, BoxLayout.Y_AXIS));
 
             for (int i = 0; i < countBoats.length; i++) {
-                labelBoats[i] = new Label(Const.NAMES_BOATS[i] + " " + (Const.QUANTITY_BOATS_TYPE - countBoats[i]));
+                labelBoats[i] = new Label(Const.NAMES_BOATS[i] + "(" + Const.SIZE_BOATS[i] + ")" + ": " + (Const.QUANTITY_BOATS_TYPE - countBoats[i]));
                 countBoatsPanel.add(labelBoats[i]);
             }
 
@@ -282,22 +322,54 @@ public class PanelGame extends JPanel {
             inputs.add(panelCoorX);
             inputs.add(panelDirection);
 
+            JPanel panelNort = new JPanel();
+            panelNort.add(back);
+            clearBoard.addActionListener(new ClearBoardListener());
+            panelNort.add(clearBoard);
+            panelNort.add(countErrorLabel);
+
             add(inputs, BorderLayout.WEST);
             add(controllers, BorderLayout.SOUTH);
             add(boardConfig, BorderLayout.EAST);
-            add(back, BorderLayout.NORTH);
+            add(panelNort, BorderLayout.NORTH);
+        }
+
+        private class ClearBoardListener implements ActionListener {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                int result = JOptionPane.showConfirmDialog(mainPanel, "Seguro deseas limpiar el tablero");
+
+                if (result == 0) {
+                    battleShip.getBoardPlayer().clearBoard();
+                    ClearConfig();
+                    paintCountBoats();
+                }
+            }
+
+        }
+
+        public void paintCountBoats() {
+            for (int i = 0; i < countBoats.length; i++) {
+                labelBoats[i].setText(Const.NAMES_BOATS[i] + "(" + Const.SIZE_BOATS[i] + ")" + ": " + (Const.QUANTITY_BOATS_TYPE - countBoats[i]));
+            }
         }
 
         private class ActionAddBoat implements ActionListener {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                int index = boats.getSelectedIndex();
-                if (countBoats[index] < Const.QUANTITY_BOATS_TYPE) {
-                    checkAndCreate(index);
+                if (isCompleted()) {
+                    JOptionPane.showMessageDialog(mainPanel, "Ya puedes comenzar el juego!");
                 } else {
-                    countErrorPlayer++;
-                    JOptionPane.showMessageDialog(mainPanel, "Elije otro tipo de Barco!", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                    int index = boats.getSelectedIndex();
+                    if (countBoats[index] < Const.QUANTITY_BOATS_TYPE) {
+                        checkAndCreate(index);
+                    } else {
+                        countErrorPlayer++;
+                        JOptionPane.showMessageDialog(mainPanel, "Elije otro tipo de Barco!", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                    countErrorLabel.setText("Error: " + countErrorPlayer);
                 }
             }
 
@@ -333,13 +405,11 @@ public class PanelGame extends JPanel {
                             boardConfig.setModelBoard(battleShip.getBoardPlayer());
                             countBoats[index]++;
 
-                            for (int i = 0; i < countBoats.length; i++) {
-                                labelBoats[i].setText(Const.NAMES_BOATS[i] + " " + (Const.QUANTITY_BOATS_TYPE - countBoats[i]));
-                            }
+                            paintCountBoats();
 
                             coorX.setText("");
                             coorY.setText("");
-                            
+
                             countErrorPlayer--;
 
                         } else {
@@ -367,7 +437,7 @@ public class PanelGame extends JPanel {
         ));
         return borderPanel;
     }
-    
+
     private void clearBoard() {
         battleShip.getBoardMachine().clearBoard();
         battleShip.getBoardPlayer().clearBoard();

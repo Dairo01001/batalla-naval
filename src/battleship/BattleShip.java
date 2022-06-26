@@ -12,7 +12,7 @@ public class BattleShip {
     private final Board boardMachine;
 
     public BattleShip() {
-        this.player = null;
+        this.player = new Player("X", 0);
         this.machine = new Machine();
         this.boardPlayer = new Board();
         this.boardMachine = new Board();

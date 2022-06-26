@@ -78,6 +78,7 @@ public class Main extends JFrame {
         @Override
         public void actionPerformed(ActionEvent ae) {
             if (!panelMenu.getNamePlayer().equals("")) {
+                panelGame.getPlayer().setNombre(panelMenu.getNamePlayer());
                 panels.show(mainPanel, "Play");
             } else {
                 JOptionPane.showMessageDialog(mainPanel, "Ecribe tu nombre!");

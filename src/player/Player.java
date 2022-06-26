@@ -2,8 +2,12 @@ package player;
 
 public class Player {
 
-    private final String nombre;
+    private String nombre;
     private int score;
+    
+    public Player() {
+        
+    }
 
     public Player(String nombre, int score) {
         this.nombre = nombre;
@@ -20,6 +24,10 @@ public class Player {
 
     public void setScore(int score) {
         this.score = score;
+    }
+    
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     @Override
